@@ -3,15 +3,22 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}Flight-Smart{% endblock %}</title>
+    <title>{% block title %}Flight-Smart | Temukan Waktu Terbaik Membeli Tiket{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
         theme: {
           extend: {
             colors: {
-              navy: "#0b1f3a",
-              sky: "#38bdf8"
+              navy: "#00275A",
+              ocean: "#14568E",
+              orange: "#F86A00"
+            },
+            fontFamily: {
+              sans: ["Poppins", "ui-sans-serif", "system-ui", "sans-serif"]
             }
           }
         }
@@ -19,23 +26,25 @@
     </script>
   </head>
   <body class="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
-    <nav class="bg-navy text-white">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="h-16 flex items-center justify-between">
-          <a href="{{ url_for('index') }}" class="text-xl font-bold text-sky">Flight-Smart</a>
-          <button id="menu-button" type="button" class="md:hidden p-2 rounded hover:bg-white/10" aria-label="Buka menu">
-            <span class="text-2xl">☰</span>
-          </button>
-          <div id="menu" class="hidden md:flex items-center gap-6">
-            <a href="{{ url_for('index') }}" class="hover:text-sky">Home</a>
-            <a href="{{ url_for('dashboard') }}" class="hover:text-sky">Dashboard &amp; Simulasi</a>
-            <a href="{{ url_for('chat') }}" class="hover:text-sky">Flight-Bot</a>
+    <nav class="relative z-30 bg-navy text-white">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="flex h-[72px] items-center justify-between">
+          <a href="{{ url_for('index') }}" class="flex items-center gap-2 text-xl font-extrabold tracking-tight"><span class="flex h-9 w-9 items-center justify-center rounded-xl bg-orange text-lg">✈</span>Flight<span class="text-orange">-Smart</span></a>
+          <button id="menu-button" type="button" class="rounded-lg p-2 hover:bg-white/10 md:hidden" aria-label="Buka menu" aria-expanded="false"><span class="text-2xl">☰</span></button>
+          <div id="menu" class="hidden items-center gap-8 text-sm font-medium md:flex">
+            <a href="{{ url_for('index') }}" class="text-orange">Beranda</a>
+            <a href="/#hasil" class="transition hover:text-orange">Dashboard &amp; Simulasi</a>
+            <a href="#fitur" class="transition hover:text-orange">Fitur</a>
+            <a href="#faq" class="transition hover:text-orange">FAQ</a>
+            <a href="{{ url_for('chat') }}" class="rounded-full border border-white/40 px-5 py-2 transition hover:border-orange hover:text-orange">Flight-Bot</a>
           </div>
         </div>
-        <div id="mobile-menu" class="hidden md:hidden pb-4 space-y-3">
-          <a href="{{ url_for('index') }}" class="block hover:text-sky">Home</a>
-          <a href="{{ url_for('dashboard') }}" class="block hover:text-sky">Dashboard &amp; Simulasi</a>
-          <a href="{{ url_for('chat') }}" class="block hover:text-sky">Flight-Bot</a>
+        <div id="mobile-menu" class="hidden space-y-3 pb-5 text-sm font-medium md:hidden">
+          <a href="{{ url_for('index') }}" class="block text-orange">Beranda</a>
+          <a href="/#hasil" class="block hover:text-orange">Dashboard &amp; Simulasi</a>
+          <a href="#fitur" class="block hover:text-orange">Fitur</a>
+          <a href="#faq" class="block hover:text-orange">FAQ</a>
+          <a href="{{ url_for('chat') }}" class="block hover:text-orange">Flight-Bot</a>
         </div>
       </div>
     </nav>
@@ -44,13 +53,18 @@
       {% block content %}{% endblock %}
     </main>
 
-    <footer class="bg-navy text-slate-300 text-center text-sm py-4">
-      &copy; 2026 Flight-Smart. Asisten perjalanan dan analitik harga tiket.
+    <footer class="bg-navy text-slate-300">
+      <div class="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-8 text-sm sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
+        <a href="{{ url_for('index') }}" class="text-lg font-extrabold text-white">Flight<span class="text-orange">-Smart</span></a>
+        <p>&copy; 2026 Flight-Smart. Asisten perjalanan dan analitik harga tiket.</p>
+        <div class="flex gap-4"><a href="/#hasil" class="hover:text-orange">Dashboard</a><a href="{{ url_for('chat') }}" class="hover:text-orange">Bantuan</a></div>
+      </div>
     </footer>
 
     <script>
       document.getElementById("menu-button").addEventListener("click", function () {
         document.getElementById("mobile-menu").classList.toggle("hidden");
+        this.setAttribute("aria-expanded", this.getAttribute("aria-expanded") !== "true");
       });
     </script>
   </body>
