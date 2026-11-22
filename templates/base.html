@@ -32,19 +32,17 @@
           <a href="{{ url_for('index') }}" class="flex items-center gap-2 text-xl font-extrabold tracking-tight"><span class="flex h-9 w-9 items-center justify-center rounded-xl bg-orange text-lg">✈</span>Flight<span class="text-orange">-Smart</span></a>
           <button id="menu-button" type="button" class="rounded-lg p-2 hover:bg-white/10 md:hidden" aria-label="Buka menu" aria-expanded="false"><span class="text-2xl">☰</span></button>
           <div id="menu" class="hidden items-center gap-8 text-sm font-medium md:flex">
-            <a href="{{ url_for('index') }}" class="text-orange">Beranda</a>
-            <a href="/#hasil" class="transition hover:text-orange">Dashboard &amp; Simulasi</a>
-            <a href="#fitur" class="transition hover:text-orange">Fitur</a>
-            <a href="#faq" class="transition hover:text-orange">FAQ</a>
-            <a href="{{ url_for('chat') }}" class="rounded-full border border-white/40 px-5 py-2 transition hover:border-orange hover:text-orange">Flight-Bot</a>
+            <a href="{{ url_for('index') }}" class="{% if request.path == '/' %}text-orange underline decoration-1 underline-offset-8{% else %}text-white transition hover:text-orange{% endif %}">Beranda</a>
+            <a href="/#fitur" class="text-white transition hover:text-orange">Fitur</a>
+            <a href="/#faq" class="text-white transition hover:text-orange">FAQ</a>
+            <a href="{{ url_for('chat') }}" class="rounded-full border border-white/40 px-5 py-2 text-white transition hover:border-orange hover:text-orange {% if request.path == '/chat' %}border-orange text-orange underline decoration-1 underline-offset-4{% endif %}">Flight-Bot</a>
           </div>
         </div>
         <div id="mobile-menu" class="hidden space-y-3 pb-5 text-sm font-medium md:hidden">
-          <a href="{{ url_for('index') }}" class="block text-orange">Beranda</a>
-          <a href="/#hasil" class="block hover:text-orange">Dashboard &amp; Simulasi</a>
-          <a href="#fitur" class="block hover:text-orange">Fitur</a>
-          <a href="#faq" class="block hover:text-orange">FAQ</a>
-          <a href="{{ url_for('chat') }}" class="block hover:text-orange">Flight-Bot</a>
+          <a href="{{ url_for('index') }}" class="block {% if request.path == '/' %}text-orange underline decoration-1 underline-offset-4{% else %}text-white hover:text-orange{% endif %}">Beranda</a>
+          <a href="/#fitur" class="block text-white hover:text-orange">Fitur</a>
+          <a href="/#faq" class="block text-white hover:text-orange">FAQ</a>
+          <a href="{{ url_for('chat') }}" class="block text-white hover:text-orange {% if request.path == '/chat' %}text-orange underline decoration-1 underline-offset-4{% endif %}">Flight-Bot</a>
         </div>
       </div>
     </nav>
@@ -57,7 +55,7 @@
       <div class="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-8 text-sm sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
         <a href="{{ url_for('index') }}" class="text-lg font-extrabold text-white">Flight<span class="text-orange">-Smart</span></a>
         <p>&copy; 2026 Flight-Smart. Asisten perjalanan dan analitik harga tiket.</p>
-        <div class="flex gap-4"><a href="/#hasil" class="hover:text-orange">Dashboard</a><a href="{{ url_for('chat') }}" class="hover:text-orange">Bantuan</a></div>
+        <div class="flex gap-4"><a href="{{ url_for('dashboard') }}" class="hover:text-orange">Analitik</a><a href="{{ url_for('chat') }}" class="hover:text-orange">Bantuan</a></div>
       </div>
     </footer>
 

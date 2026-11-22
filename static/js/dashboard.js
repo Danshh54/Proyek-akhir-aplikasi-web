@@ -1,5 +1,33 @@
-document.addEventListener("DOMContentLoaded", function () {
+function formatAmount(value) {
+  return `INR ${Math.round(Number(value)).toLocaleString("id-ID")}`;
+}
+
+function readSummary(summary) {
+  const urgent = Math.round(Number(summary.harga_dadakan));
+  const safe = Math.round(Number(summary.harga_aman));
+  const savings = Math.max(0, urgent - safe);
+  const percentage = Number(summary.persentase_hemat).toLocaleString("id-ID", {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  });
+  const start = Number(summary.waktu_aman_beli.start);
+  const end = Number(summary.waktu_aman_beli.end);
+
+  return { urgent, safe, savings, percentage, smaller: Math.min(start, end), larger: Math.max(start, end) };
+}
+
+async function fetchDashboardData(asal, tujuan, kelas) {
+  const params = new URLSearchParams({ asal, tujuan, kelas });
+  const response = await fetch(`/api/dashboard-data?${params}`);
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || "Data analitik tidak dapat dimuat.");
+  return { data, params };
+}
+
+function initLandingDashboard() {
   const form = document.getElementById("route-search");
+  if (!form) return;
+
   const asal = document.getElementById("quick-asal");
   const tujuan = document.getElementById("quick-tujuan");
   const kelas = document.getElementById("quick-kelas");
@@ -9,82 +37,105 @@ document.addEventListener("DOMContentLoaded", function () {
   const verdict = document.getElementById("dashboard-verdict");
   const cards = document.getElementById("dashboard-cards");
 
-  function formatAmount(value) {
-    return value === null || value === undefined
-      ? "-"
-      : `INR ${Math.round(Number(value)).toLocaleString("id-ID")}`;
-  }
-
   function setLoading(isLoading) {
     loading.classList.toggle("hidden", !isLoading);
-    form.querySelectorAll("select, button").forEach((element) => {
-      element.disabled = isLoading;
-    });
+    form.querySelectorAll("select, button").forEach((element) => { element.disabled = isLoading; });
   }
 
-  function showError(message) {
-    error.textContent = message;
-    error.classList.remove("hidden");
-    verdict.classList.add("hidden");
-    cards.classList.add("hidden");
-  }
-
-  async function loadDashboardData(shouldScroll) {
+  async function load(shouldScroll) {
     results.classList.remove("hidden");
     error.classList.add("hidden");
-
     if (shouldScroll) results.scrollIntoView({ behavior: "smooth", block: "start" });
-    if (!asal.value || !tujuan.value || !kelas.value) {
+    if (!asal.value || !tujuan.value || !kelas.value) return;
+    if (asal.value === tujuan.value) {
+      error.textContent = "Kota asal dan tujuan harus berbeda.";
+      error.classList.remove("hidden");
       verdict.classList.add("hidden");
       cards.classList.add("hidden");
-      return;
-    }
-    if (asal.value === tujuan.value) {
-      showError("Kota asal dan tujuan harus berbeda.");
       return;
     }
 
     setLoading(true);
     verdict.classList.add("hidden");
     try {
-      const params = new URLSearchParams({ asal: asal.value, tujuan: tujuan.value, kelas: kelas.value });
-      const response = await fetch(`/api/dashboard-data?${params}`);
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Data dashboard tidak dapat dimuat.");
-
-      const summary = data.summary;
-      const urgent = Math.round(Number(summary.harga_dadakan));
-      const safe = Math.round(Number(summary.harga_aman));
-      const savings = Math.max(0, urgent - safe);
-      const percentage = Math.round(Number(summary.persentase_hemat)).toLocaleString("id-ID");
-      const start = Number(summary.waktu_aman_beli.start);
-      const end = Number(summary.waktu_aman_beli.end);
-      const smaller = Math.min(start, end);
-      const larger = Math.max(start, end);
-
-      document.getElementById("harga-dadakan").textContent = formatAmount(urgent);
-      document.getElementById("harga-aman").textContent = formatAmount(safe);
-      verdict.textContent = `Beli ${smaller} sampai ${larger} hari sebelum berangkat, hemat sekitar INR ${savings.toLocaleString("id-ID")} (${percentage}%).`;
+      const { data, params } = await fetchDashboardData(asal.value, tujuan.value, kelas.value);
+      const summary = readSummary(data.summary);
+      document.getElementById("harga-dadakan").textContent = formatAmount(summary.urgent);
+      document.getElementById("harga-aman").textContent = formatAmount(summary.safe);
+      verdict.textContent = `Beli ${summary.smaller} sampai ${summary.larger} hari sebelum berangkat, hemat sekitar INR ${summary.savings.toLocaleString("id-ID")} (${summary.percentage}%)`; //jangan kasih titik
       verdict.classList.remove("hidden");
       document.getElementById("full-analytics-link").href = `/dashboard?${params.toString()}`;
       cards.classList.remove("hidden");
     } catch (err) {
-      showError(err.message);
+      error.textContent = err.message;
+      error.classList.remove("hidden");
+      cards.classList.add("hidden");
     } finally {
       setLoading(false);
     }
   }
 
-  form.addEventListener("submit", function (event) {
-    event.preventDefault();
-    loadDashboardData(true);
-  });
-
+  form.addEventListener("submit", (event) => { event.preventDefault(); load(true); });
   [asal, tujuan, kelas].forEach((select) => {
-    select.addEventListener("change", function () {
-      if (!results.classList.contains("hidden")) loadDashboardData(false);
+    select.addEventListener("change", () => {
+      if (!results.classList.contains("hidden")) load(false);
     });
   });
+  if (asal.value && tujuan.value && kelas.value) load(false);
+}
 
-  if (asal.value && tujuan.value && kelas.value) loadDashboardData(false);
+function initStandaloneDashboard() {
+  const form = document.getElementById("dashboard-filters");
+  if (!form) return;
+
+  const asal = document.getElementById("dashboard-asal");
+  const tujuan = document.getElementById("dashboard-tujuan");
+  const kelas = document.getElementById("dashboard-kelas");
+  const loading = document.getElementById("dashboard-loading");
+  const error = document.getElementById("dashboard-error");
+  const summaryElement = document.getElementById("dashboard-summary");
+
+  function setLoading(isLoading) {
+    loading.classList.toggle("hidden", !isLoading);
+    form.querySelectorAll("select").forEach((select) => { select.disabled = isLoading; });
+  }
+
+  async function load() {
+    error.classList.add("hidden");
+    if (!asal.value || !tujuan.value || !kelas.value) {
+      summaryElement.classList.add("hidden");
+      return;
+    }
+    if (asal.value === tujuan.value) {
+      error.textContent = "Kota asal dan tujuan harus berbeda.";
+      error.classList.remove("hidden");
+      summaryElement.classList.add("hidden");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { data } = await fetchDashboardData(asal.value, tujuan.value, kelas.value);
+      const summary = readSummary(data.summary);
+      document.getElementById("dashboard-harga-dadakan").textContent = formatAmount(summary.urgent);
+      document.getElementById("dashboard-harga-aman").textContent = formatAmount(summary.safe);
+      document.getElementById("dashboard-potensi-hemat").textContent = `INR ${summary.savings.toLocaleString("id-ID")} (${summary.percentage}%)`;
+      document.getElementById("dashboard-waktu-aman").textContent = `${summary.smaller}-${summary.larger} hari sebelum berangkat`;
+      summaryElement.classList.remove("hidden");
+    } catch (err) {
+      error.textContent = err.message;
+      error.classList.remove("hidden");
+      summaryElement.classList.add("hidden");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  form.addEventListener("change", load);
+  if (asal.value && tujuan.value && kelas.value) load();
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  initLandingDashboard();
+  initStandaloneDashboard();
 });

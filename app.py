@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, redirect, render_template, request, url_for
+from flask import Flask, jsonify, render_template, request
 
 from core.data_manager import FlightDataManager
 
@@ -24,9 +24,29 @@ def index():
 
 @app.route("/dashboard")
 def dashboard():
-    query = request.args.to_dict(flat=True)
-    destination = url_for("index", **query) + "#hasil"
-    return redirect(destination)
+    selected_asal = request.args.get("asal", "")
+    selected_tujuan = request.args.get("tujuan", "")
+    selected_kelas = request.args.get("kelas", "")
+    if not any((selected_asal, selected_tujuan, selected_kelas)):
+        preferred = ("Delhi", "Mumbai", "Economy")
+        valid = dm.data[
+            (dm.data["source_city"] == preferred[0])
+            & (dm.data["destination_city"] == preferred[1])
+            & (dm.data["class"] == preferred[2])
+        ]
+        if valid.empty:
+            preferred = tuple(dm.data[["source_city", "destination_city", "class"]].drop_duplicates().iloc[0])
+        selected_asal, selected_tujuan, selected_kelas = preferred
+
+    return render_template(
+        "dashboard.html",
+        source_cities=sorted(dm.data["source_city"].unique()),
+        destination_cities=sorted(dm.data["destination_city"].unique()),
+        classes=sorted(dm.data["class"].unique()),
+        selected_asal=selected_asal,
+        selected_tujuan=selected_tujuan,
+        selected_kelas=selected_kelas,
+    )
 
 
 @app.route("/api/dashboard-data", methods=["GET"])
