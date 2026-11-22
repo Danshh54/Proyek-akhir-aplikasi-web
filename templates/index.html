@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="bg-navy text-white">
+    <div class="max-w-7xl mx-auto px-4 py-20 sm:px-6 lg:px-8 grid gap-12 lg:grid-cols-2 lg:items-center">
+      <div>
+        <p class="text-sky font-semibold mb-3">Asisten Perjalanan &amp; Analitik Harga</p>
+        <h1 class="text-4xl sm:text-5xl font-bold max-w-3xl">Beli tiket di Waktu Aman Beli dengan memahami dynamic pricing.</h1>
+        <p class="mt-5 text-slate-300 max-w-2xl">Flight-Smart membantu membaca perubahan harga tiket pesawat dan menemukan waktu pembelian yang lebih hemat.</p>
+      </div>
+      <div class="rounded-2xl bg-white/10 border border-white/20 p-6 shadow-xl">
+        <div class="flex items-center justify-between mb-6">
+          <span class="text-sm text-slate-300">Ilustrasi tren harga</span>
+          <span class="rounded-full bg-sky/20 px-3 py-1 text-xs text-sky">Dynamic Pricing</span>
+        </div>
+        <svg viewBox="0 0 400 180" class="w-full" role="img" aria-label="Ilustrasi kurva harga tiket">
+          <path d="M20 150H380M20 20V150" stroke="currentColor" stroke-opacity=".25" />
+          <path d="M25 135 C90 130 145 120 190 112 S270 95 300 78 S345 45 375 22" fill="none" stroke="#38bdf8" stroke-width="5" stroke-linecap="round" />
+          <circle cx="375" cy="22" r="6" fill="#38bdf8" />
+          <text x="285" y="165" fill="currentColor" font-size="12">H-1</text>
+          <text x="25" y="165" fill="currentColor" font-size="12">H-30</text>
+        </svg>
+        <p class="mt-4 font-semibold text-sky">Harga naik tajam mendekati H-1</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="relative z-10 -mt-16 max-w-5xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+      <h2 class="text-2xl font-bold text-navy">Quick Route Search</h2>
+      <form id="route-search" action="{{ url_for('dashboard') }}" method="get" class="mt-6 grid gap-4 sm:grid-cols-3">
+        <label class="text-sm font-medium text-slate-700">
+          Kota Asal
+          <select name="asal" required class="mt-2 w-full rounded-lg border-slate-300 p-3">
+            <option value="">Pilih kota asal</option>
+            {% for city in source_cities %}
+              <option value="{{ city }}">{{ city }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="text-sm font-medium text-slate-700">
+          Kota Tujuan
+          <select name="tujuan" required class="mt-2 w-full rounded-lg border-slate-300 p-3">
+            <option value="">Pilih kota tujuan</option>
+            {% for city in destination_cities %}
+              <option value="{{ city }}">{{ city }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="text-sm font-medium text-slate-700">
+          Kelas
+          <select name="kelas" required class="mt-2 w-full rounded-lg border-slate-300 p-3">
+            <option value="">Pilih kelas</option>
+            {% for flight_class in classes %}
+              <option value="{{ flight_class }}">{{ flight_class }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <button type="submit" class="sm:col-span-3 rounded-lg bg-sky px-5 py-3 font-semibold text-navy hover:bg-sky-300">Lihat Analitik Rute</button>
+      </form>
+    </div>
+  </section>
+
+  <script>
+    document.getElementById("route-search").addEventListener("submit", function (event) {
+      const asal = this.elements.asal.value;
+      const tujuan = this.elements.tujuan.value;
+      if (asal === tujuan) {
+        event.preventDefault();
+        alert("Kota asal dan tujuan harus berbeda.");
+      }
+    });
+  </script>
+{% endblock %}

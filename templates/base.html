@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Flight-Smart{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              navy: "#0b1f3a",
+              sky: "#38bdf8"
+            }
+          }
+        }
+      };
+    </script>
+  </head>
+  <body class="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
+    <nav class="bg-navy text-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="h-16 flex items-center justify-between">
+          <a href="{{ url_for('index') }}" class="text-xl font-bold text-sky">Flight-Smart</a>
+          <button id="menu-button" type="button" class="md:hidden p-2 rounded hover:bg-white/10" aria-label="Buka menu">
+            <span class="text-2xl">☰</span>
+          </button>
+          <div id="menu" class="hidden md:flex items-center gap-6">
+            <a href="{{ url_for('index') }}" class="hover:text-sky">Home</a>
+            <a href="{{ url_for('dashboard') }}" class="hover:text-sky">Dashboard &amp; Simulasi</a>
+            <a href="{{ url_for('chat') }}" class="hover:text-sky">Flight-Bot</a>
+          </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden pb-4 space-y-3">
+          <a href="{{ url_for('index') }}" class="block hover:text-sky">Home</a>
+          <a href="{{ url_for('dashboard') }}" class="block hover:text-sky">Dashboard &amp; Simulasi</a>
+          <a href="{{ url_for('chat') }}" class="block hover:text-sky">Flight-Bot</a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="flex-1">
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-navy text-slate-300 text-center text-sm py-4">
+      &copy; 2026 Flight-Smart. Asisten perjalanan dan analitik harga tiket.
+    </footer>
+
+    <script>
+      document.getElementById("menu-button").addEventListener("click", function () {
+        document.getElementById("mobile-menu").classList.toggle("hidden");
+      });
+    </script>
+  </body>
+</html>
