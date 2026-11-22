@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, render_template, request
+import pandas as pd
 
 from core.data_manager import FlightDataManager
 
@@ -60,7 +61,22 @@ def dashboard_data():
     if asal == tujuan:
         return jsonify({"error": "Kota asal dan tujuan harus berbeda."}), 400
 
-    return jsonify(dm.get_dashboard_data(asal, tujuan, kelas))
+    result = dm.get_dashboard_data(asal, tujuan, kelas)
+    frame = dm.data[
+        (dm.data["source_city"] == asal)
+        & (dm.data["destination_city"] == tujuan)
+        & (dm.data["class"] == kelas)
+    ]
+    departure_order = ["Early_Morning", "Morning", "Afternoon", "Evening", "Night", "Late_Night"]
+    departure = frame.groupby("departure_time", as_index=False)["price"].mean()
+    departure["departure_time"] = pd.Categorical(
+        departure["departure_time"], categories=departure_order, ordered=True
+    )
+    departure = departure.sort_values("departure_time")
+    result["chart"]["rata_rata_jam_berangkat"] = departure.rename(
+        columns={"departure_time": "jam_berangkat", "price": "harga"}
+    ).to_dict("records")
+    return jsonify(result)
 
 
 @app.route("/chat")
