@@ -11,6 +11,7 @@ data_manager = FlightDataManager("data/Clean_Dataset.csv")
 def index():
     return render_template(
         "index.html",
+        stats=data_manager.get_global_stats(),
         source_cities=sorted(data_manager.data["source_city"].unique()),
         destination_cities=sorted(data_manager.data["destination_city"].unique()),
         classes=sorted(data_manager.data["class"].unique()),

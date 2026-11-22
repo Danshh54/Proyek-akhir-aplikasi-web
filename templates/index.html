@@ -59,6 +59,25 @@
         <button type="submit" class="sm:col-span-3 rounded-lg bg-sky px-5 py-3 font-semibold text-navy hover:bg-sky-300">Lihat Analitik Rute</button>
       </form>
     </div>
+
+    <div class="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div class="rounded-xl bg-white p-5 shadow-sm border border-slate-200">
+        <p class="text-sm text-slate-500">Total Penerbangan Dianalisis</p>
+        <p class="mt-2 text-2xl font-bold text-navy">{{ "{:,.0f}".format(stats.total_sampel) }}</p>
+      </div>
+      <div class="rounded-xl bg-white p-5 shadow-sm border border-slate-200">
+        <p class="text-sm text-slate-500">Rata-Rata Hemat Non-Dadakan</p>
+        <p class="mt-2 text-2xl font-bold text-navy">{{ "{:,.2f}".format(stats.rata_rata_penghematan_persen) }}%</p>
+      </div>
+      <div class="rounded-xl bg-white p-5 shadow-sm border border-slate-200">
+        <p class="text-sm text-slate-500">Jumlah Rute Aktif</p>
+        <p class="mt-2 text-2xl font-bold text-navy">{{ "{:,.0f}".format(stats.total_rute) }}</p>
+      </div>
+      <div class="rounded-xl bg-white p-5 shadow-sm border border-slate-200">
+        <p class="text-sm text-slate-500">Tarif Terendah</p>
+        <p class="mt-2 text-2xl font-bold text-navy">INR {{ "{:,.0f}".format(stats.tarif_termurah) }}</p>
+      </div>
+    </div>
   </section>
 
   <script>
